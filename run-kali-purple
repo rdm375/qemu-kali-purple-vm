@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+
+DISK="kali-purple-2025.2.qcow2"
+
+qemu-system-x86_64 \
+  -enable-kvm \
+  -cpu host -smp 4 -m 8192 \
+  -machine q35 \
+  -drive file="$DISK",if=virtio,format=qcow2 \
+  -device virtio-net-pci,netdev=n0 \
+  -netdev user,id=n0 \
+  -display none \
+  -device virtio-vga \
+  -spice port=5900,disable-ticketing=on \
+  -device virtio-serial-pci \
+  -chardev spicevmc,id=vdagent,name=vdagent \
+  -device virtserialport,chardev=vdagent,name=com.redhat.spice.0 \
+&
+
+ QEMU_PID=$!
+
+# Wait for SPICE port to be ready
+for i in {1..50}; do
+  if ss -lnt | grep -q ':5900'; then
+    break
+  fi
+  sleep 0.1
+done
+
+# Launch SPICE viewer
+remote-viewer spice://127.0.0.1:5900 &
+
+wait $QEMU_PID
+
+
+ 
