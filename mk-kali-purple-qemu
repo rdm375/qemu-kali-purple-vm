@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 DISK="kali-purple-2025.2.qcow2"
-OS_ISO=""
+OS_ISO="kali-linux-2025.2-installer-purple-amd64.iso"
 
 if [[ ! -f "$DISK" ]]; then
   qemu-img create -f qcow2 "$DISK" 80G
@@ -12,7 +12,7 @@ qemu-system-x86_64 \
   -cpu host -smp 4 -m 8192 \
   -machine q35 \
   -drive file="$DISK",if=virtio,format=qcow2 \
-  -cdrom kali-linux-2025.2-installer-purple-amd64.iso \
+  -cdrom $OS_ISO \
   -boot d \
   -device virtio-net-pci,netdev=n0 \
   -netdev user,id=n0 \
